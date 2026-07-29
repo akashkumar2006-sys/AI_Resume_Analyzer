@@ -1,653 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
 
-from flask import Flask, render_template, request, send_file
-import os
-import re
-import PyPDF2
-import joblib
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from report import create_report
+    <title>AI Resume Analyzer</title>
 
-app = Flask(__name__)
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-UPLOAD_FOLDER = "uploads"
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+</head>
 
+<body>
 
+<header>
 
-# Load trained model
+<div class="container nav-container">
 
-model = joblib.load("model/resume_model.pkl")
+<div class="logo">
 
+<i class="fa-solid fa-robot"></i>
 
+<span>AI Resume Analyzer</span>
 
-# Skills database
+</div>
 
-SKILLS = [
+<nav>
 
-    "Python",
-    "Machine Learning",
-    "Artificial Intelligence",
-    "AI",
-    "SQL",
-    "Excel",
-    "HTML",
-    "CSS",
-    "JavaScript",
-    "Java",
-    "C++",
-    "Data Structures",
-    "Algorithms",
-    "TensorFlow",
-    "Deep Learning",
-    "Flask",
-    "React",
-    "Power BI",
-    "PyTorch",
-    "Django",
-    "AWS",
-    "Docker"
+<ul>
 
-]
+<li><a href="#home">Home</a></li>
 
+<li><a href="#features">Features</a></li>
 
+<li><a href="#analyzer">Analyzer</a></li>
 
-def extract_skills(text):
+<li><a href="#about">About</a></li>
 
-    detected = []
+<li><a href="#faq">FAQ</a></li>
 
-    text = text.lower()
+</ul>
 
-    for skill in SKILLS:
+</nav>
 
-        if skill.lower() in text:
+<a href="#analyzer" class="nav-btn">Analyze Now</a>
 
-            detected.append(skill)
+</div>
 
-    return detected
+</header>
 
 
 
+<section class="hero" id="home">
 
-def calculate_score(text, skills):
+<div class="container hero-container">
 
-    score = 0
+<div class="hero-left">
 
-    text_lower = text.lower()
+<h1>
 
+Analyze Your Resume with
 
-    score += min(len(skills) * 5, 40)
+<span>Artificial Intelligence</span>
 
+</h1>
 
-    if len(text) > 1000:
+<p>
 
-        score += 20
+Upload your resume, compare it with any job description, discover ATS score,
+identify missing skills, and receive AI-powered suggestions to improve your
+career opportunities.
 
-    elif len(text) > 500:
+</p>
 
-        score += 10
+<div class="hero-buttons">
 
+<a href="#analyzer" class="btn-primary">
 
-    sections = [
+Analyze Resume
 
-        "education",
-        "project",
-        "experience",
-        "certification",
-        "skills"
+</a>
 
-    ]
+<a href="#features" class="btn-secondary">
 
+Explore Features
 
-    for section in sections:
+</a>
 
-        if section in text_lower:
+</div>
 
-            score += 8
+<div class="hero-stats">
 
+<div class="stat-card">
 
-    return min(score, 100)
+<h2>95%</h2>
 
+<p>ATS Accuracy</p>
 
+</div>
 
+<div class="stat-card">
 
-def calculate_ats_score(text, skills, prediction):
+<h2>AI</h2>
 
-    score = 0
+<p>Career Prediction</p>
 
-    text_lower = text.lower()
+</div>
 
+<div class="stat-card">
 
-    score += min(len(skills) * 5, 50)
+<h2>100+</h2>
 
+<p>Skill Detection</p>
 
-    sections = [
+</div>
 
-        "education",
-        "project",
-        "experience",
-        "skills",
-        "certification"
+</div>
 
-    ]
+</div>
 
+<div class="hero-right">
 
-    for section in sections:
+<div class="hero-card">
 
-        if section in text_lower:
+<i class="fa-solid fa-file-lines"></i>
 
-            score += 10
+<h3>Smart Resume Analysis</h3>
 
+<p>
 
-    if prediction.lower() in text_lower:
+Instant resume evaluation using Machine Learning,
+Natural Language Processing and ATS matching.
 
-        score += 10
+</p>
 
+</div>
 
-    return min(score, 100)
+</div>
 
+</div>
 
+</section>
 
 
-def generate_suggestions(skills, prediction):
 
-    recommended = {
+<section class="features" id="features">
 
-        "AI Engineer": [
-            "Deep Learning",
-            "TensorFlow",
-            "PyTorch",
-            "SQL"
-        ],
+<div class="container">
 
-        "ML Engineer": [
-            "Deep Learning",
-            "TensorFlow",
-            "Statistics"
-        ],
+<h2 class="section-title">
 
-        "Data Analyst": [
-            "SQL",
-            "Excel",
-            "Power BI"
-        ],
+Why Choose AI Resume Analyzer?
 
-        "Frontend Developer": [
-            "JavaScript",
-            "React",
-            "UI Design"
-        ],
+</h2>
 
-        "Software Engineer": [
-            "Data Structures",
-            "Algorithms",
-            "System Design"
-        ]
+<p class="section-subtitle">
 
-    }
+Everything you need to evaluate and improve your resume.
 
+</p>
 
-    required = recommended.get(prediction, [])
+<div class="feature-grid">
 
+<div class="feature-card">
 
-    missing = []
+<i class="fa-solid fa-brain"></i>
 
+<h3>AI Prediction</h3>
 
-    for skill in required:
+<p>
 
-        if skill.lower() not in [s.lower() for s in skills]:
+Predict the most suitable career role using Machine Learning.
 
-            missing.append(skill)
+</p>
 
+</div>
 
+<div class="feature-card">
 
-    suggestions = [
+<i class="fa-solid fa-chart-line"></i>
 
-        "Add more practical projects",
+<h3>ATS Score</h3>
 
-        "Add certifications and experience"
+<p>
 
-    ]
+Check how well your resume performs with Applicant Tracking Systems.
 
+</p>
 
-    if len(skills) < 5:
+</div>
 
-        suggestions.append(
-            "Add more technical skills"
-        )
+<div class="feature-card">
 
+<i class="fa-solid fa-code"></i>
 
-    if missing:
+<h3>Skill Detection</h3>
 
-        suggestions.append(
-            "Learn missing skills for better career opportunities"
-        )
+<p>
 
+Automatically identify technical skills present in your resume.
 
-    return missing, suggestions
+</p>
 
+</div>
 
+<div class="feature-card">
 
+<i class="fa-solid fa-magnifying-glass-chart"></i>
 
-def analyze_resume_quality(text, skills):
+<h3>Job Matching</h3>
 
-    strengths = []
+<p>
 
-    weaknesses = []
+Compare your resume with any job description using NLP.
 
-    text_lower = text.lower()
+</p>
 
+</div>
 
+<div class="feature-card">
 
-    if len(skills) >= 5:
+<i class="fa-solid fa-lightbulb"></i>
 
-        strengths.append(
-            "Strong technical skill coverage"
-        )
+<h3>AI Suggestions</h3>
 
-    else:
+<p>
 
-        weaknesses.append(
-            "Add more technical skills"
-        )
+Receive personalized recommendations to improve your profile.
 
+</p>
 
+</div>
 
-    if "project" in text_lower:
+<div class="feature-card">
 
-        strengths.append(
-            "Projects section detected"
-        )
+<i class="fa-solid fa-file-pdf"></i>
 
-    else:
+<h3>PDF Report</h3>
 
-        weaknesses.append(
-            "Add projects section"
-        )
+<p>
 
+Download a professional resume analysis report.
 
+</p>
 
-    if "experience" in text_lower or "internship" in text_lower:
+</div>
 
-        strengths.append(
-            "Experience detected"
-        )
+</div>
 
-    else:
+</div>
 
-        weaknesses.append(
-            "Add internship or experience"
-        )
+</section>
+<!-- ================= ANALYZER SECTION ================= -->
 
+<section class="analyzer" id="analyzer">
 
-    return strengths, weaknesses
+<div class="container">
 
+<h2 class="section-title">
+AI Resume Analyzer
+</h2>
 
+<p class="section-subtitle">
+Upload your resume and compare it with your dream job description.
+</p>
 
+<div class="analyzer-card">
 
-def extract_contact_info(text):
+<form action="/analyze"
+      method="POST"
+      enctype="multipart/form-data">
 
-    name = "Not Found"
+<div class="form-group">
 
-    email = "Not Found"
+<label>
+<i class="fa-solid fa-file-arrow-up"></i>
+Upload Resume (PDF)
+</label>
 
-    phone = "Not Found"
+<input
+type="file"
+name="resume"
+accept=".pdf"
+required>
 
+</div>
 
 
-    email_match = re.search(
-        r'[\w\.-]+@[\w\.-]+',
-        text
-    )
+<div class="form-group">
 
-    if email_match:
+<label>
+<i class="fa-solid fa-briefcase"></i>
+Job Description
+</label>
 
-        email = email_match.group()
+<textarea
+name="job_description"
+rows="8"
+placeholder="Paste the complete Job Description here..."></textarea>
 
+</div>
 
 
-    phone_match = re.search(
-        r'\b\d{10}\b',
-        text
-    )
+<div class="button-area">
 
-    if phone_match:
+<button
+type="submit"
+class="analyze-btn">
 
-        phone = phone_match.group()
+<i class="fa-solid fa-microchip"></i>
 
+Analyze Resume
 
+</button>
 
-    lines = text.split("\n")
+</div>
 
+</form>
 
-    for line in lines:
+</div>
 
-        line = line.strip()
+</div>
 
-        if len(line.split()) <= 4 and line.replace(" ","").isalpha():
+</section>
 
-            name = line
 
-            break
 
+<!-- ================= ABOUT SECTION ================= -->
 
+<section class="about" id="about">
 
-    return name, email, phone
+<div class="container">
 
+<div class="about-left">
 
+<h2>
 
+About AI Resume Analyzer
 
-# Improved NLP Job Matching
+</h2>
 
-def analyze_job_match(resume_text, job_description):
+<p>
 
-    if job_description.strip() == "":
+AI Resume Analyzer is an intelligent web application built using
+Machine Learning, Natural Language Processing and Flask.
 
-        return 0, [], []
+It helps students, freshers and professionals evaluate their resumes,
+predict suitable career roles, calculate ATS score,
+detect missing skills and compare resumes with job descriptions.
 
+</p>
 
+<p>
 
-    documents = [
+The project uses Python, Scikit-Learn, Flask,
+HTML, CSS and JavaScript to deliver
+fast and accurate resume analysis.
 
-        resume_text,
+</p>
 
-        job_description
+</div>
 
-    ]
+<div class="about-right">
 
+<div class="about-card">
 
-    vectorizer = TfidfVectorizer(
+<i class="fa-solid fa-robot"></i>
 
-        stop_words="english"
+<h3>
 
-    )
+AI Powered
 
+</h3>
 
-    vectors = vectorizer.fit_transform(documents)
+<p>
 
+Uses Machine Learning models for career prediction.
 
-    similarity = cosine_similarity(
+</p>
 
-        vectors[0:1],
+</div>
 
-        vectors[1:2]
+<div class="about-card">
 
-    )[0][0]
+<i class="fa-solid fa-ranking-star"></i>
 
+<h3>
 
-    match_score = int(similarity * 100)
+ATS Friendly
 
+</h3>
 
+<p>
 
-    resume_words = set(
+Calculates resume compatibility with Applicant Tracking Systems.
 
-        resume_text.lower().split()
+</p>
 
-    )
+</div>
 
+<div class="about-card">
 
-    job_words = set(
+<i class="fa-solid fa-chart-column"></i>
 
-        job_description.lower().split()
+<h3>
 
-    )
+NLP Matching
 
+</h3>
 
-    matched = resume_words.intersection(job_words)
+<p>
 
+Matches resume with job description using NLP.
 
-    missing = job_words.difference(resume_words)
+</p>
 
+</div>
 
+</div>
 
-    return (
+</div>
 
-        match_score,
+</section>
 
-        list(matched)[:15],
 
-        list(missing)[:15]
 
-    )
+<!-- ================= HOW IT WORKS ================= -->
 
+<section class="steps">
 
+<div class="container">
 
+<h2 class="section-title">
 
-def extract_text(pdf_path):
+How It Works
 
-    text = ""
+</h2>
 
+<div class="steps-grid">
 
-    with open(pdf_path, "rb") as file:
+<div class="step">
 
-        reader = PyPDF2.PdfReader(file)
+<div class="step-number">
 
+1
 
-        for page in reader.pages:
+</div>
 
-            page_text = page.extract_text()
+<h3>
 
-            if page_text:
+Upload Resume
 
-                text += page_text
+</h3>
 
+<p>
 
+Upload your resume in PDF format.
 
-    return text
+</p>
 
+</div>
 
+<div class="step">
 
+<div class="step-number">
 
-@app.route("/")
-def home():
+2
 
-    return render_template("index.html")
+</div>
 
+<h3>
 
+Paste Job Description
 
+</h3>
 
-@app.route("/analyze", methods=["POST"])
-def analyze():
+<p>
 
+Provide the job description for comparison.
 
-    resume = request.files["resume"]
+</p>
 
+</div>
 
-    job_description = request.form.get(
+<div class="step">
 
-        "job_description",
+<div class="step-number">
 
-        ""
+3
 
-    )
+</div>
 
+<h3>
 
+AI Analysis
 
-    file_path = os.path.join(
+</h3>
 
-        app.config["UPLOAD_FOLDER"],
+<p>
 
-        resume.filename
+The model predicts career role,
+calculates ATS score and analyzes skills.
 
-    )
+</p>
 
+</div>
 
-    resume.save(file_path)
+<div class="step">
 
+<div class="step-number">
 
+4
 
-    resume_text = extract_text(file_path)
+</div>
 
+<h3>
 
+Download Report
 
-    prediction = model.predict(
+</h3>
 
-        [resume_text]
+<p>
 
-    )[0]
+View the complete analysis and download a professional PDF report.
 
+</p>
 
+</div>
 
-    skills = extract_skills(resume_text)
+</div>
 
+</div>
 
-
-    score = calculate_score(
-
-        resume_text,
-
-        skills
-
-    )
-
-
-
-    ats_score = calculate_ats_score(
-
-        resume_text,
-
-        skills,
-
-        prediction
-
-    )
-
-
-
-    missing_skills, suggestions = generate_suggestions(
-
-        skills,
-
-        prediction
-
-    )
-
-
-
-    strengths, weaknesses = analyze_resume_quality(
-
-        resume_text,
-
-        skills
-
-    )
-
-
-
-    name, email, phone = extract_contact_info(
-
-        resume_text
-
-    )
-
-
-
-    job_match, matched_keywords, missing_keywords = analyze_job_match(
-
-        resume_text,
-
-        job_description
-
-    )
-
-
-
-    return render_template(
-
-        "result.html",
-
-        prediction=prediction,
-
-        skills=skills,
-
-        score=score,
-
-        ats_score=ats_score,
-
-        job_match=job_match,
-
-        matched_keywords=matched_keywords,
-
-        missing_keywords=missing_keywords,
-
-        missing_skills=missing_skills,
-
-        suggestions=suggestions,
-
-        strengths=strengths,
-
-        weaknesses=weaknesses,
-
-        name=name,
-
-        email=email,
-
-        phone=phone,
-
-        resume_text=resume_text
-
-    )
-    
-@app.route("/download_report")
-def download_report():
-
-    data = {
-
-        "name": request.args.get("name"),
-
-        "email": request.args.get("email"),
-
-        "phone": request.args.get("phone"),
-
-        "prediction": request.args.get("prediction"),
-
-        "score": request.args.get("score"),
-
-        "ats_score": request.args.get("ats_score"),
-
-        "job_match": request.args.get("job_match"),
-
-        "skills": request.args.get("skills", "").split(","),
-
-        "strengths": request.args.get("strengths", "").split(","),
-
-        "weaknesses": request.args.get("weaknesses", "").split(","),
-
-        "suggestions": request.args.get("suggestions", "").split(",")
-
-    }
-
-
-    filename = "AI_Resume_Analysis_Report.pdf"
-
-
-    create_report(
-        data,
-        filename
-    )
-
-
-    return send_file(
-        filename,
-        as_attachment=True
-    )
-
-
-
-if __name__ == "__main__":
-
-    app.run(
-
-        debug=True,
-
-        host="0.0.0.0",
-
-        port=5000
-
-    )
+</section>
