@@ -1,1 +1,306 @@
 <!-- AI Resume Analyzer Result Page -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Resume Analyzer Dashboard</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard">
+
+
+<h1>🚀 AI Resume Analyzer Dashboard</h1>
+
+
+
+<!-- Profile -->
+
+<div class="card">
+
+<h2>👤 Candidate Profile</h2>
+
+<p><b>Name:</b> {{name}}</p>
+
+<p><b>Email:</b> {{email}}</p>
+
+<p><b>Phone:</b> {{phone}}</p>
+
+</div>
+
+
+
+
+<!-- Career -->
+
+<div class="card">
+
+<h2>🎯 Recommended Career</h2>
+
+<div class="career">
+
+{{prediction}}
+
+</div>
+
+</div>
+
+
+
+
+
+<!-- Scores -->
+
+<div class="score-container">
+
+
+<div class="card score">
+
+<h3>📊 Resume Score</h3>
+
+<h1>{{score}}%</h1>
+
+<div class="progress">
+
+<div style="width:{{score}}%"></div>
+
+</div>
+
+</div>
+
+
+
+<div class="card score">
+
+<h3>🤖 ATS Score</h3>
+
+<h1>{{ats_score}}%</h1>
+
+
+<div class="progress">
+
+<div style="width:{{ats_score}}%"></div>
+
+</div>
+
+
+</div>
+
+
+
+<div class="card score">
+
+<h3>💼 Job Match</h3>
+
+<h1>{{job_match}}%</h1>
+
+
+<div class="progress">
+
+<div style="width:{{job_match}}%"></div>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<!-- Skills -->
+
+<div class="card">
+
+<h2>🛠 Skills Detected</h2>
+
+
+<div class="tags">
+
+
+{% for skill in skills %}
+
+<span>
+
+{{skill}}
+
+</span>
+
+
+{% endfor %}
+
+
+</div>
+
+</div>
+
+
+
+
+
+<!-- Keywords -->
+
+
+<div class="card">
+
+
+<h2>✅ Matched Keywords</h2>
+
+
+{% for item in matched_keywords %}
+
+<p>✔ {{item}}</p>
+
+
+{% endfor %}
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>❌ Missing Keywords</h2>
+
+
+{% for item in missing_keywords %}
+
+<p>⚠ {{item}}</p>
+
+
+{% endfor %}
+
+
+</div>
+
+
+
+
+
+<!-- Strength -->
+
+<div class="card">
+
+
+<h2>🟢 Strengths</h2>
+
+
+{% for item in strengths %}
+
+<p>✅ {{item}}</p>
+
+
+{% endfor %}
+
+
+</div>
+
+
+
+
+
+<!-- Improvement -->
+
+<div class="card">
+
+
+<h2>🔴 Improvements</h2>
+
+
+{% for item in weaknesses %}
+
+<p>⚠ {{item}}</p>
+
+
+{% endfor %}
+
+
+</div>
+
+
+
+
+
+<!-- Suggestions -->
+
+
+<div class="card">
+
+
+<h2>💡 AI Suggestions</h2>
+
+
+{% for item in suggestions %}
+
+<p>💡 {{item}}</p>
+
+
+{% endfor %}
+
+
+</div>
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>📄 Resume Text</h2>
+
+
+<p class="resume">
+
+{{resume_text}}
+
+</p>
+
+
+</div>
+
+
+
+
+<a class="button"
+href="/download_report?name={{name}}&email={{email}}&phone={{phone}}&prediction={{prediction}}&score={{score}}&ats_score={{ats_score}}&job_match={{job_match}}&skills={{skills|join(',')}}&strengths={{strengths|join(',')}}&weaknesses={{weaknesses|join(',')}}&suggestions={{suggestions|join(',')}}">
+📥 Download AI Resume Report PDF
+</a>
+
+
+<br><br>
+
+
+<a href="/" class="button">
+🔄 Analyze Another Resume
+</a>
+
+
+</div>
+
+
+
+</body>
+
+</html>
