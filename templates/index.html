@@ -1,1 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Resume Analyzer</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="container nav-container">
+
+<div class="logo">
+
+<i class="fa-solid fa-robot"></i>
+
+<span>AI Resume Analyzer</span>
+
+</div>
+
+<nav>
+
+<ul>
+
+<li><a href="#home">Home</a></li>
+
+<li><a href="#features">Features</a></li>
+
+<li><a href="#analyzer">Analyzer</a></li>
+
+<li><a href="#about">About</a></li>
+
+<li><a href="#faq">FAQ</a></li>
+
+</ul>
+
+</nav>
+
+<a href="#analyzer" class="nav-btn">Analyze Now</a>
+
+</div>
+
+</header>
+
+
+
+<section class="hero" id="home">
+
+<div class="container hero-container">
+
+<div class="hero-left">
+
+<h1>
+
+Analyze Your Resume with
+
+<span>Artificial Intelligence</span>
+
+</h1>
+
+<p>
+
+Upload your resume, compare it with any job description, discover ATS score,
+identify missing skills, and receive AI-powered suggestions to improve your
+career opportunities.
+
+</p>
+
+<div class="hero-buttons">
+
+<a href="#analyzer" class="btn-primary">
+
+Analyze Resume
+
+</a>
+
+<a href="#features" class="btn-secondary">
+
+Explore Features
+
+</a>
+
+</div>
+
+<div class="hero-stats">
+
+<div class="stat-card">
+
+<h2>95%</h2>
+
+<p>ATS Accuracy</p>
+
+</div>
+
+<div class="stat-card">
+
+<h2>AI</h2>
+
+<p>Career Prediction</p>
+
+</div>
+
+<div class="stat-card">
+
+<h2>100+</h2>
+
+<p>Skill Detection</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="hero-right">
+
+<div class="hero-card">
+
+<i class="fa-solid fa-file-lines"></i>
+
+<h3>Smart Resume Analysis</h3>
+
+<p>
+
+Instant resume evaluation using Machine Learning,
+Natural Language Processing and ATS matching.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<section class="features" id="features">
+
+<div class="container">
+
+<h2 class="section-title">
+
+Why Choose AI Resume Analyzer?
+
+</h2>
+
+<p class="section-subtitle">
+
+Everything you need to evaluate and improve your resume.
+
+</p>
+
+<div class="feature-grid">
+
+<div class="feature-card">
+
+<i class="fa-solid fa-brain"></i>
+
+<h3>AI Prediction</h3>
+
+<p>
+
+Predict the most suitable career role using Machine Learning.
+
+</p>
+
+</div>
+
+<div class="feature-card">
+
+<i class="fa-solid fa-chart-line"></i>
+
+<h3>ATS Score</h3>
+
+<p>
+
+Check how well your resume performs with Applicant Tracking Systems.
+
+</p>
+
+</div>
+
+<div class="feature-card">
+
+<i class="fa-solid fa-code"></i>
+
+<h3>Skill Detection</h3>
+
+<p>
+
+Automatically identify technical skills present in your resume.
+
+</p>
+
+</div>
+
+<div class="feature-card">
+
+<i class="fa-solid fa-magnifying-glass-chart"></i>
+
+<h3>Job Matching</h3>
+
+<p>
+
+Compare your resume with any job description using NLP.
+
+</p>
+
+</div>
+
+<div class="feature-card">
+
+<i class="fa-solid fa-lightbulb"></i>
+
+<h3>AI Suggestions</h3>
+
+<p>
+
+Receive personalized recommendations to improve your profile.
+
+</p>
+
+</div>
+
+<div class="feature-card">
+
+<i class="fa-solid fa-file-pdf"></i>
+
+<h3>PDF Report</h3>
+
+<p>
+
+Download a professional resume analysis report.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+<!-- ================= ANALYZER SECTION ================= -->
+
+<section class="analyzer" id="analyzer">
+
+<div class="container">
+
+<h2 class="section-title">
+AI Resume Analyzer
+</h2>
+
+<p class="section-subtitle">
+Upload your resume and compare it with your dream job description.
+</p>
+
+<div class="analyzer-card">
+
+<form action="/analyze"
+      method="POST"
+      enctype="multipart/form-data">
+
+<div class="form-group">
+
+<label>
+<i class="fa-solid fa-file-arrow-up"></i>
+Upload Resume (PDF)
+</label>
+
+<input
+type="file"
+name="resume"
+accept=".pdf"
+required>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+<i class="fa-solid fa-briefcase"></i>
+Job Description
+</label>
+
+<textarea
+name="job_description"
+rows="8"
+placeholder="Paste the complete Job Description here..."></textarea>
+
+</div>
+
+
+<div class="button-area">
+
+<button
+type="submit"
+class="analyze-btn">
+
+<i class="fa-solid fa-microchip"></i>
+
+Analyze Resume
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= ABOUT SECTION ================= -->
+
+<section class="about" id="about">
+
+<div class="container">
+
+<div class="about-left">
+
+<h2>
+
+About AI Resume Analyzer
+
+</h2>
+
+<p>
+
+AI Resume Analyzer is an intelligent web application built using
+Machine Learning, Natural Language Processing and Flask.
+
+It helps students, freshers and professionals evaluate their resumes,
+predict suitable career roles, calculate ATS score,
+detect missing skills and compare resumes with job descriptions.
+
+</p>
+
+<p>
+
+The project uses Python, Scikit-Learn, Flask,
+HTML, CSS and JavaScript to deliver
+fast and accurate resume analysis.
+
+</p>
+
+</div>
+
+<div class="about-right">
+
+<div class="about-card">
+
+<i class="fa-solid fa-robot"></i>
+
+<h3>
+
+AI Powered
+
+</h3>
+
+<p>
+
+Uses Machine Learning models for career prediction.
+
+</p>
+
+</div>
+
+<div class="about-card">
+
+<i class="fa-solid fa-ranking-star"></i>
+
+<h3>
+
+ATS Friendly
+
+</h3>
+
+<p>
+
+Calculates resume compatibility with Applicant Tracking Systems.
+
+</p>
+
+</div>
+
+<div class="about-card">
+
+<i class="fa-solid fa-chart-column"></i>
+
+<h3>
+
+NLP Matching
+
+</h3>
+
+<p>
+
+Matches resume with job description using NLP.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= HOW IT WORKS ================= -->
+
+<section class="steps">
+
+<div class="container">
+
+<h2 class="section-title">
+
+How It Works
+
+</h2>
+
+<div class="steps-grid">
+
+<div class="step">
+
+<div class="step-number">
+
+1
+
+</div>
+
+<h3>
+
+Upload Resume
+
+</h3>
+
+<p>
+
+Upload your resume in PDF format.
+
+</p>
+
+</div>
+
+<div class="step">
+
+<div class="step-number">
+
+2
+
+</div>
+
+<h3>
+
+Paste Job Description
+
+</h3>
+
+<p>
+
+Provide the job description for comparison.
+
+</p>
+
+</div>
+
+<div class="step">
+
+<div class="step-number">
+
+3
+
+</div>
+
+<h3>
+
+AI Analysis
+
+</h3>
+
+<p>
+
+The model predicts career role,
+calculates ATS score and analyzes skills.
+
+</p>
+
+</div>
+
+<div class="step">
+
+<div class="step-number">
+
+4
+
+</div>
+
+<h3>
+
+Download Report
+
+</h3>
+
+<p>
+
+View the complete analysis and download a professional PDF report.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+<!-- ====================== STATISTICS ====================== -->
+
+<section class="stats">
+
+    <div class="container">
+
+        <div class="stats-grid">
+
+            <div class="stat-box">
+                <h2>10K+</h2>
+                <p>Resumes Analyzed</p>
+            </div>
+
+            <div class="stat-box">
+                <h2>95%</h2>
+                <p>Prediction Accuracy</p>
+            </div>
+
+            <div class="stat-box">
+                <h2>100+</h2>
+                <p>Skills Detected</p>
+            </div>
+
+            <div class="stat-box">
+                <h2>24/7</h2>
+                <p>AI Availability</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ====================== FAQ ====================== -->
+
+<section class="faq" id="faq">
+
+    <div class="container">
+
+        <h2 class="section-title">
+            Frequently Asked Questions
+        </h2>
+
+        <div class="faq-container">
+
+            <div class="faq-item">
+                <h3>Is my resume stored?</h3>
+                <p>
+                    No. Your resume is processed only for analysis.
+                    It is not permanently stored.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Which file formats are supported?</h3>
+                <p>
+                    Currently only PDF resumes are supported.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>How is ATS score calculated?</h3>
+                <p>
+                    ATS score is estimated using skills,
+                    resume sections,
+                    keyword matching,
+                    formatting
+                    and AI-based analysis.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Can I compare with any job description?</h3>
+                <p>
+                    Yes.
+                    Paste any job description and the AI will
+                    calculate similarity and missing keywords.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ====================== CONTACT ====================== -->
+
+<section class="contact">
+
+    <div class="container">
+
+        <h2 class="section-title">
+
+            Ready To Improve Your Resume?
+
+        </h2>
+
+        <p class="section-subtitle">
+
+            Upload your resume now and receive
+            intelligent AI-powered feedback.
+
+        </p>
+
+        <a href="#analyzer" class="btn-primary">
+
+            Analyze Resume
+
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- ====================== FOOTER ====================== -->
+
+<footer>
+
+    <div class="container footer-content">
+
+        <div class="footer-logo">
+
+            <i class="fa-solid fa-robot"></i>
+
+            AI Resume Analyzer
+
+        </div>
+
+        <div class="footer-links">
+
+            <a href="#home">Home</a>
+
+            <a href="#features">Features</a>
+
+            <a href="#analyzer">Analyzer</a>
+
+            <a href="#about">About</a>
+
+            <a href="#faq">FAQ</a>
+
+        </div>
+
+        <p>
+
+            © 2026 AI Resume Analyzer |
+            Built with Flask, Python,
+            Machine Learning,
+            HTML,
+            CSS &
+            JavaScript.
+
+        </p>
+
+    </div>
+
+</footer>
+
+
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>
