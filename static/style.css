@@ -1,652 +1,1345 @@
-from flask import Flask, render_template, request, send_file
-import os
-import re
-import PyPDF2
-import joblib
+/*==================================================
+AI RESUME ANALYZER
+Premium Responsive Stylesheet
+Part 1
+==================================================*/
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    scroll-behavior:smooth;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#07111f;
+    color:#ffffff;
+    overflow-x:hidden;
+    line-height:1.7;
+}
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from report import create_report
+/* Scrollbar */
 
-app = Flask(__name__)
+::-webkit-scrollbar{
+    width:10px;
+}
 
+::-webkit-scrollbar-track{
+    background:#081524;
+}
 
-UPLOAD_FOLDER = "uploads"
+::-webkit-scrollbar-thumb{
+    background:#2f80ed;
+    border-radius:20px;
+}
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+::-webkit-scrollbar-thumb:hover{
+    background:#56ccf2;
+}
 
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+/* Container */
 
+.container{
+    width:90%;
+    max-width:1250px;
+    margin:auto;
+}
 
+/* Links */
 
-# Load trained model
+a{
+    text-decoration:none;
+    color:white;
+}
 
-model = joblib.load("model/resume_model.pkl")
+ul{
+    list-style:none;
+}
 
+/* Headings */
 
+.section-title{
+    text-align:center;
+    font-size:42px;
+    font-weight:700;
+    margin-bottom:15px;
+}
 
-# Skills database
+.section-subtitle{
+    text-align:center;
+    color:#b7c4d7;
+    max-width:700px;
+    margin:auto;
+    margin-bottom:60px;
+    font-size:17px;
+}
 
-SKILLS = [
+/* Buttons */
 
-    "Python",
-    "Machine Learning",
-    "Artificial Intelligence",
-    "AI",
-    "SQL",
-    "Excel",
-    "HTML",
-    "CSS",
-    "JavaScript",
-    "Java",
-    "C++",
-    "Data Structures",
-    "Algorithms",
-    "TensorFlow",
-    "Deep Learning",
-    "Flask",
-    "React",
-    "Power BI",
-    "PyTorch",
-    "Django",
-    "AWS",
-    "Docker"
+.btn-primary{
 
-]
+    display:inline-block;
+    background:linear-gradient(135deg,#2f80ed,#56ccf2);
+    padding:15px 36px;
+    border-radius:50px;
+    color:white;
+    font-weight:600;
+    transition:.4s;
+    box-shadow:0 12px 35px rgba(47,128,237,.35);
 
+}
 
+.btn-primary:hover{
 
-def extract_skills(text):
+    transform:translateY(-5px);
 
-    detected = []
+}
 
-    text = text.lower()
+.btn-secondary{
 
-    for skill in SKILLS:
+    display:inline-block;
+    margin-left:15px;
+    border:2px solid #56ccf2;
+    padding:15px 36px;
+    border-radius:50px;
+    transition:.4s;
 
-        if skill.lower() in text:
+}
 
-            detected.append(skill)
+.btn-secondary:hover{
 
-    return detected
+    background:#56ccf2;
+    color:#07111f;
 
+}
 
+/* Navbar */
 
+header{
 
-def calculate_score(text, skills):
+    width:100%;
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:999;
+    background:rgba(5,15,30,.85);
+    backdrop-filter:blur(14px);
 
-    score = 0
+}
 
-    text_lower = text.lower()
+.nav-container{
 
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px 0;
 
-    score += min(len(skills) * 5, 40)
+}
 
+.logo{
 
-    if len(text) > 1000:
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:28px;
+    font-weight:700;
+    color:#56ccf2;
 
-        score += 20
+}
 
-    elif len(text) > 500:
+.logo i{
 
-        score += 10
+    font-size:30px;
 
+}
 
-    sections = [
+nav ul{
 
-        "education",
-        "project",
-        "experience",
-        "certification",
-        "skills"
+    display:flex;
+    gap:32px;
 
-    ]
+}
 
+nav ul li a{
 
-    for section in sections:
+    color:white;
+    font-weight:500;
+    transition:.3s;
 
-        if section in text_lower:
+}
 
-            score += 8
+nav ul li a:hover{
 
+    color:#56ccf2;
 
-    return min(score, 100)
+}
 
+.nav-btn{
 
+    background:#2f80ed;
+    padding:12px 24px;
+    border-radius:35px;
+    transition:.4s;
 
+}
 
-def calculate_ats_score(text, skills, prediction):
+.nav-btn:hover{
 
-    score = 0
+    background:#56ccf2;
+    color:#07111f;
 
-    text_lower = text.lower()
+}
+/*====================================
+HERO SECTION
+====================================*/
 
+.hero{
 
-    score += min(len(skills) * 5, 50)
+    padding-top:150px;
+    padding-bottom:120px;
 
+    background:
+    radial-gradient(circle at top right,#1d4ed822,transparent 45%),
+    radial-gradient(circle at bottom left,#38bdf822,transparent 40%);
 
-    sections = [
+}
 
-        "education",
-        "project",
-        "experience",
-        "skills",
-        "certification"
+.hero-container{
 
-    ]
+    display:grid;
 
+    grid-template-columns:1.1fr .9fr;
 
-    for section in sections:
+    gap:60px;
 
-        if section in text_lower:
+    align-items:center;
 
-            score += 10
+}
 
+.hero-left h1{
 
-    if prediction.lower() in text_lower:
+    font-size:60px;
 
-        score += 10
+    line-height:1.2;
 
+    margin-bottom:25px;
 
-    return min(score, 100)
+    font-weight:700;
 
+}
 
+.hero-left span{
 
+    color:#56ccf2;
 
-def generate_suggestions(skills, prediction):
+}
 
-    recommended = {
+.hero-left p{
 
-        "AI Engineer": [
-            "Deep Learning",
-            "TensorFlow",
-            "PyTorch",
-            "SQL"
-        ],
+    font-size:18px;
 
-        "ML Engineer": [
-            "Deep Learning",
-            "TensorFlow",
-            "Statistics"
-        ],
+    color:#c7d4e8;
 
-        "Data Analyst": [
-            "SQL",
-            "Excel",
-            "Power BI"
-        ],
+    margin-bottom:35px;
 
-        "Frontend Developer": [
-            "JavaScript",
-            "React",
-            "UI Design"
-        ],
+}
 
-        "Software Engineer": [
-            "Data Structures",
-            "Algorithms",
-            "System Design"
-        ]
+.hero-buttons{
 
-    }
+    display:flex;
 
+    flex-wrap:wrap;
 
-    required = recommended.get(prediction, [])
+    gap:20px;
 
+    margin-bottom:50px;
 
-    missing = []
+}
 
+.hero-right{
 
-    for skill in required:
+    display:flex;
 
-        if skill.lower() not in [s.lower() for s in skills]:
+    justify-content:center;
 
-            missing.append(skill)
+    align-items:center;
 
+}
 
+.hero-card{
 
-    suggestions = [
+    width:100%;
 
-        "Add more practical projects",
+    max-width:420px;
 
-        "Add certifications and experience"
+    background:rgba(255,255,255,.06);
 
-    ]
+    backdrop-filter:blur(20px);
 
+    border:1px solid rgba(255,255,255,.1);
 
-    if len(skills) < 5:
+    border-radius:25px;
 
-        suggestions.append(
-            "Add more technical skills"
-        )
+    padding:50px;
 
+    text-align:center;
 
-    if missing:
+    transition:.4s;
 
-        suggestions.append(
-            "Learn missing skills for better career opportunities"
-        )
+    box-shadow:0 20px 45px rgba(0,0,0,.25);
 
+}
 
-    return missing, suggestions
+.hero-card:hover{
 
+    transform:translateY(-10px);
 
+}
 
+.hero-card i{
 
-def analyze_resume_quality(text, skills):
+    font-size:70px;
 
-    strengths = []
+    color:#56ccf2;
 
-    weaknesses = []
+    margin-bottom:25px;
 
-    text_lower = text.lower()
+}
 
+.hero-card h3{
 
+    font-size:30px;
 
-    if len(skills) >= 5:
+    margin-bottom:15px;
 
-        strengths.append(
-            "Strong technical skill coverage"
-        )
+}
 
-    else:
+.hero-card p{
 
-        weaknesses.append(
-            "Add more technical skills"
-        )
+    color:#c9d5e6;
 
+}
 
+/*==============================
+STATS
+==============================*/
 
-    if "project" in text_lower:
+.hero-stats{
 
-        strengths.append(
-            "Projects section detected"
-        )
+    display:flex;
 
-    else:
+    gap:20px;
 
-        weaknesses.append(
-            "Add projects section"
-        )
+    flex-wrap:wrap;
 
+}
 
+.stat-card{
 
-    if "experience" in text_lower or "internship" in text_lower:
+    flex:1;
 
-        strengths.append(
-            "Experience detected"
-        )
+    min-width:150px;
 
-    else:
+    background:rgba(255,255,255,.05);
 
-        weaknesses.append(
-            "Add internship or experience"
-        )
+    border:1px solid rgba(255,255,255,.08);
 
+    border-radius:20px;
 
-    return strengths, weaknesses
+    padding:25px;
 
+    text-align:center;
 
+    transition:.3s;
 
+}
 
-def extract_contact_info(text):
+.stat-card:hover{
 
-    name = "Not Found"
+    transform:translateY(-8px);
 
-    email = "Not Found"
+    background:#2f80ed;
 
-    phone = "Not Found"
+}
 
+.stat-card h2{
 
+    font-size:34px;
 
-    email_match = re.search(
-        r'[\w\.-]+@[\w\.-]+',
-        text
-    )
+    color:#56ccf2;
 
-    if email_match:
+    margin-bottom:10px;
 
-        email = email_match.group()
+}
 
+.stat-card:hover h2{
 
+    color:#fff;
 
-    phone_match = re.search(
-        r'\b\d{10}\b',
-        text
-    )
+}
 
-    if phone_match:
+.stat-card p{
 
-        phone = phone_match.group()
+    color:#d7e5f4;
 
+}
 
+/*==============================
+FEATURES
+==============================*/
 
-    lines = text.split("\n")
+.features{
 
+    padding:110px 0;
 
-    for line in lines:
+}
 
-        line = line.strip()
+.feature-grid{
 
-        if len(line.split()) <= 4 and line.replace(" ","").isalpha():
+    display:grid;
 
-            name = line
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
 
-            break
+    gap:30px;
 
+}
 
+.feature-card{
 
-    return name, email, phone
+    background:rgba(255,255,255,.05);
 
+    border:1px solid rgba(255,255,255,.08);
 
+    border-radius:25px;
 
+    padding:40px 30px;
 
-# Improved NLP Job Matching
+    transition:.35s;
 
-def analyze_job_match(resume_text, job_description):
+    text-align:center;
 
-    if job_description.strip() == "":
+}
 
-        return 0, [], []
+.feature-card:hover{
 
+    transform:translateY(-12px);
 
+    background:#0d2746;
 
-    documents = [
+}
 
-        resume_text,
+.feature-card i{
 
-        job_description
+    font-size:55px;
 
-    ]
+    color:#56ccf2;
 
+    margin-bottom:25px;
 
-    vectorizer = TfidfVectorizer(
+}
 
-        stop_words="english"
+.feature-card h3{
 
-    )
+    margin-bottom:15px;
 
+    font-size:24px;
 
-    vectors = vectorizer.fit_transform(documents)
+}
 
+.feature-card p{
 
-    similarity = cosine_similarity(
+    color:#c8d6e8;
 
-        vectors[0:1],
+}
+/*====================================
+ANALYZER SECTION
+====================================*/
 
-        vectors[1:2]
+.analyzer{
 
-    )[0][0]
+    padding:110px 0;
 
+    background:#081523;
 
-    match_score = int(similarity * 100)
+}
 
+.analyzer-card{
 
+    max-width:900px;
 
-    resume_words = set(
+    margin:auto;
 
-        resume_text.lower().split()
+    background:rgba(255,255,255,.05);
 
-    )
+    backdrop-filter:blur(18px);
 
+    border-radius:25px;
 
-    job_words = set(
+    border:1px solid rgba(255,255,255,.08);
 
-        job_description.lower().split()
+    padding:50px;
 
-    )
+    box-shadow:0 15px 40px rgba(0,0,0,.25);
 
+}
 
-    matched = resume_words.intersection(job_words)
+.form-group{
 
+    margin-bottom:30px;
 
-    missing = job_words.difference(resume_words)
+}
 
+.form-group label{
 
+    display:block;
 
-    return (
+    margin-bottom:12px;
 
-        match_score,
+    font-size:18px;
 
-        list(matched)[:15],
+    font-weight:600;
 
-        list(missing)[:15]
+}
 
-    )
+.form-group label i{
 
+    color:#56ccf2;
 
+    margin-right:8px;
 
+}
 
-def extract_text(pdf_path):
+.form-group input[type="file"]{
 
-    text = ""
+    width:100%;
 
+    padding:18px;
 
-    with open(pdf_path, "rb") as file:
+    background:#0f2034;
 
-        reader = PyPDF2.PdfReader(file)
+    border:2px dashed #56ccf2;
 
+    border-radius:15px;
 
-        for page in reader.pages:
+    color:white;
 
-            page_text = page.extract_text()
+    cursor:pointer;
 
-            if page_text:
+}
 
-                text += page_text
+.form-group textarea{
 
+    width:100%;
 
+    min-height:220px;
 
-    return text
+    resize:vertical;
 
+    padding:18px;
 
+    border:none;
 
+    outline:none;
 
-@app.route("/")
-def home():
+    border-radius:15px;
 
-    return render_template("index.html")
+    background:#10263d;
 
+    color:white;
 
+    font-size:16px;
 
+}
 
-@app.route("/analyze", methods=["POST"])
-def analyze():
+.form-group textarea::placeholder{
 
+    color:#b8c8db;
 
-    resume = request.files["resume"]
+}
 
+.button-area{
 
-    job_description = request.form.get(
+    text-align:center;
 
-        "job_description",
+    margin-top:40px;
 
-        ""
+}
 
-    )
+.analyze-btn{
 
+    border:none;
 
+    outline:none;
 
-    file_path = os.path.join(
+    cursor:pointer;
 
-        app.config["UPLOAD_FOLDER"],
+    padding:18px 45px;
 
-        resume.filename
+    border-radius:50px;
 
-    )
+    font-size:18px;
 
+    font-weight:600;
 
-    resume.save(file_path)
+    color:white;
 
+    background:linear-gradient(135deg,#2f80ed,#56ccf2);
 
+    transition:.35s;
 
-    resume_text = extract_text(file_path)
+    box-shadow:0 15px 35px rgba(47,128,237,.35);
 
+}
 
+.analyze-btn:hover{
 
-    prediction = model.predict(
+    transform:translateY(-5px);
 
-        [resume_text]
+    box-shadow:0 20px 45px rgba(47,128,237,.45);
 
-    )[0]
+}
 
+.analyze-btn i{
 
+    margin-right:10px;
 
-    skills = extract_skills(resume_text)
+}
 
+/*====================================
+ABOUT SECTION
+====================================*/
 
+.about{
 
-    score = calculate_score(
+    padding:110px 0;
 
-        resume_text,
+}
 
-        skills
+.about{
 
-    )
+    display:grid;
 
+}
 
+.about .container{
 
-    ats_score = calculate_ats_score(
+    display:grid;
 
-        resume_text,
+    grid-template-columns:1fr 1fr;
 
-        skills,
+    gap:50px;
 
-        prediction
+    align-items:center;
 
-    )
+}
 
+.about-left h2{
 
+    font-size:45px;
 
-    missing_skills, suggestions = generate_suggestions(
+    margin-bottom:25px;
 
-        skills,
+}
 
-        prediction
+.about-left p{
 
-    )
+    color:#c9d6e7;
 
+    margin-bottom:20px;
 
+    text-align:justify;
 
-    strengths, weaknesses = analyze_resume_quality(
+}
 
-        resume_text,
+.about-right{
 
-        skills
+    display:grid;
 
-    )
+    gap:25px;
 
+}
 
+.about-card{
 
-    name, email, phone = extract_contact_info(
+    background:rgba(255,255,255,.05);
 
-        resume_text
+    border-radius:20px;
 
-    )
+    padding:30px;
 
+    border:1px solid rgba(255,255,255,.08);
 
+    transition:.35s;
 
-    job_match, matched_keywords, missing_keywords = analyze_job_match(
+}
 
-        resume_text,
+.about-card:hover{
 
-        job_description
+    transform:translateY(-8px);
 
-    )
+    background:#0f2743;
 
+}
 
+.about-card i{
 
-    return render_template(
+    font-size:45px;
 
-        "result.html",
+    color:#56ccf2;
 
-        prediction=prediction,
+    margin-bottom:18px;
 
-        skills=skills,
+}
 
-        score=score,
+.about-card h3{
 
-        ats_score=ats_score,
+    font-size:24px;
 
-        job_match=job_match,
+    margin-bottom:12px;
 
-        matched_keywords=matched_keywords,
+}
 
-        missing_keywords=missing_keywords,
+.about-card p{
 
-        missing_skills=missing_skills,
+    color:#c8d5e8;
 
-        suggestions=suggestions,
+}
+/*====================================
+HOW IT WORKS
+====================================*/
 
-        strengths=strengths,
+.steps{
 
-        weaknesses=weaknesses,
+    padding:110px 0;
 
-        name=name,
+    background:#091829;
 
-        email=email,
+}
 
-        phone=phone,
+.steps-grid{
 
-        resume_text=resume_text
+    display:grid;
 
-    )
-    
-@app.route("/download_report")
-def download_report():
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
 
-    data = {
+    gap:30px;
 
-        "name": request.args.get("name"),
+    margin-top:60px;
 
-        "email": request.args.get("email"),
+}
 
-        "phone": request.args.get("phone"),
+.step{
 
-        "prediction": request.args.get("prediction"),
+    background:rgba(255,255,255,.05);
 
-        "score": request.args.get("score"),
+    border:1px solid rgba(255,255,255,.08);
 
-        "ats_score": request.args.get("ats_score"),
+    border-radius:22px;
 
-        "job_match": request.args.get("job_match"),
+    padding:35px 25px;
 
-        "skills": request.args.get("skills", "").split(","),
+    text-align:center;
 
-        "strengths": request.args.get("strengths", "").split(","),
+    transition:.35s;
 
-        "weaknesses": request.args.get("weaknesses", "").split(","),
+}
 
-        "suggestions": request.args.get("suggestions", "").split(",")
+.step:hover{
 
-    }
+    transform:translateY(-10px);
 
+    background:#12304f;
 
-    filename = "AI_Resume_Analysis_Report.pdf"
+}
 
+.step-number{
 
-    create_report(
-        data,
-        filename
-    )
+    width:70px;
 
+    height:70px;
 
-    return send_file(
-        filename,
-        as_attachment=True
-    )
+    margin:auto;
 
+    margin-bottom:20px;
 
+    border-radius:50%;
 
-if __name__ == "__main__":
+    background:linear-gradient(135deg,#2f80ed,#56ccf2);
 
-    app.run(
+    display:flex;
 
-        debug=True,
+    justify-content:center;
 
-        host="0.0.0.0",
+    align-items:center;
 
-        port=5000
+    font-size:28px;
 
-    )
+    font-weight:700;
+
+    color:#fff;
+
+}
+
+.step h3{
+
+    margin-bottom:15px;
+
+    font-size:24px;
+
+}
+
+.step p{
+
+    color:#c9d6e8;
+
+}
+
+/*====================================
+STATISTICS
+====================================*/
+
+.stats{
+
+    padding:110px 0;
+
+}
+
+.stats-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:25px;
+
+}
+
+.stat-box{
+
+    background:rgba(255,255,255,.05);
+
+    border-radius:20px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    padding:40px 25px;
+
+    text-align:center;
+
+    transition:.35s;
+
+}
+
+.stat-box:hover{
+
+    background:#12304f;
+
+    transform:translateY(-10px);
+
+}
+
+.stat-box h2{
+
+    font-size:48px;
+
+    color:#56ccf2;
+
+    margin-bottom:12px;
+
+}
+
+.stat-box p{
+
+    color:#d2dceb;
+
+    font-size:17px;
+
+}
+
+/*====================================
+FAQ
+====================================*/
+
+.faq{
+
+    padding:110px 0;
+
+    background:#091829;
+
+}
+
+.faq-container{
+
+    max-width:900px;
+
+    margin:auto;
+
+}
+
+.faq-item{
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    padding:28px;
+
+    margin-bottom:22px;
+
+    transition:.3s;
+
+}
+
+.faq-item:hover{
+
+    background:#12304f;
+
+}
+
+.faq-item h3{
+
+    margin-bottom:12px;
+
+    color:#56ccf2;
+
+}
+
+.faq-item p{
+
+    color:#d5dfec;
+
+}
+
+/*====================================
+CONTACT
+====================================*/
+
+.contact{
+
+    padding:120px 0;
+
+    text-align:center;
+
+}
+
+.contact .btn-primary{
+
+    margin-top:30px;
+
+}
+
+/*====================================
+FOOTER
+====================================*/
+
+footer{
+
+    background:#040c16;
+
+    padding:50px 0;
+
+}
+
+.footer-content{
+
+    text-align:center;
+
+}
+
+.footer-logo{
+
+    font-size:30px;
+
+    color:#56ccf2;
+
+    font-weight:700;
+
+    margin-bottom:25px;
+
+}
+
+.footer-logo i{
+
+    margin-right:10px;
+
+}
+
+.footer-links{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:25px;
+
+    flex-wrap:wrap;
+
+    margin-bottom:25px;
+
+}
+
+.footer-links a{
+
+    color:#dce8f6;
+
+    transition:.3s;
+
+}
+
+.footer-links a:hover{
+
+    color:#56ccf2;
+
+}
+
+footer p{
+
+    color:#9fb0c5;
+
+    font-size:15px;
+
+}
+/*====================================
+RESPONSIVE DESIGN
+====================================*/
+
+@media (max-width:1100px){
+
+.hero-container{
+
+grid-template-columns:1fr;
+
+text-align:center;
+
+}
+
+.hero-buttons{
+
+justify-content:center;
+
+}
+
+.hero-stats{
+
+justify-content:center;
+
+}
+
+.about .container{
+
+grid-template-columns:1fr;
+
+}
+
+.about-left{
+
+text-align:center;
+
+}
+
+.about-left p{
+
+text-align:center;
+
+}
+
+}
+
+
+@media (max-width:768px){
+
+header{
+
+padding:10px 0;
+
+}
+
+.nav-container{
+
+flex-direction:column;
+
+gap:20px;
+
+}
+
+nav ul{
+
+flex-wrap:wrap;
+
+justify-content:center;
+
+gap:18px;
+
+}
+
+.hero{
+
+padding-top:170px;
+
+}
+
+.hero-left h1{
+
+font-size:42px;
+
+}
+
+.section-title{
+
+font-size:34px;
+
+}
+
+.hero-card{
+
+padding:35px;
+
+}
+
+.hero-card h3{
+
+font-size:24px;
+
+}
+
+.analyzer-card{
+
+padding:30px;
+
+}
+
+.form-group textarea{
+
+min-height:180px;
+
+}
+
+.footer-links{
+
+flex-direction:column;
+
+gap:15px;
+
+}
+
+}
+
+
+@media (max-width:576px){
+
+.container{
+
+width:94%;
+
+}
+
+.hero{
+
+padding-top:180px;
+
+padding-bottom:80px;
+
+}
+
+.hero-left h1{
+
+font-size:34px;
+
+}
+
+.hero-left p{
+
+font-size:16px;
+
+}
+
+.btn-primary,
+
+.btn-secondary,
+
+.analyze-btn{
+
+width:100%;
+
+margin:10px 0;
+
+text-align:center;
+
+}
+
+.hero-buttons{
+
+flex-direction:column;
+
+}
+
+.hero-stats{
+
+flex-direction:column;
+
+}
+
+.stat-card{
+
+width:100%;
+
+}
+
+.feature-card{
+
+padding:30px 22px;
+
+}
+
+.step{
+
+padding:28px 20px;
+
+}
+
+.about-card{
+
+padding:25px;
+
+}
+
+.stat-box{
+
+padding:30px 20px;
+
+}
+
+.faq-item{
+
+padding:22px;
+
+}
+
+.footer-logo{
+
+font-size:24px;
+
+}
+
+}
+
+
+/*====================================
+ANIMATIONS
+====================================*/
+
+@keyframes fadeUp{
+
+0%{
+
+opacity:0;
+
+transform:translateY(40px);
+
+}
+
+100%{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+.hero-left{
+
+animation:fadeUp 1s ease;
+
+}
+
+.hero-right{
+
+animation:fadeUp 1.2s ease;
+
+}
+
+.feature-card{
+
+animation:fadeUp .8s ease;
+
+}
+
+.about-card{
+
+animation:fadeUp .8s ease;
+
+}
+
+.step{
+
+animation:fadeUp .8s ease;
+
+}
+
+.stat-box{
+
+animation:fadeUp .8s ease;
+
+}
+
+.faq-item{
+
+animation:fadeUp .8s ease;
+
+}
+
+
+/*====================================
+HOVER EFFECTS
+====================================*/
+
+.feature-card:hover i,
+
+.about-card:hover i,
+
+.hero-card:hover i{
+
+transform:scale(1.1);
+
+transition:.3s;
+
+}
+
+button,
+
+input,
+
+textarea{
+
+font-family:'Poppins',sans-serif;
+
+}
+
+input:focus,
+
+textarea:focus{
+
+outline:none;
+
+box-shadow:0 0 15px rgba(86,204,242,.4);
+
+}
+
+::selection{
+
+background:#56ccf2;
+
+color:#07111f;
+
+}
