@@ -63,14 +63,90 @@ def extract_skills(text):
 
     text = text.lower()
 
-    for skill in SKILLS:
 
-        if skill.lower() in text:
+    skill_variations = {
 
-            detected.append(skill)
+        "Python": [
+            "python"
+        ],
+
+        "Machine Learning": [
+            "machine learning",
+            "ml"
+        ],
+
+        "Artificial Intelligence": [
+            "artificial intelligence",
+            "ai"
+        ],
+
+        "SQL": [
+            "sql",
+            "mysql",
+            "postgresql"
+        ],
+
+        "JavaScript": [
+            "javascript",
+            "js"
+        ],
+
+        "React": [
+            "react",
+            "react.js",
+            "reactjs"
+        ],
+
+        "C++": [
+            "c++",
+            "cpp"
+        ],
+
+        "Deep Learning": [
+            "deep learning",
+            "dl"
+        ],
+
+        "NLP": [
+            "nlp",
+            "natural language processing"
+        ],
+
+        "Flask": [
+            "flask"
+        ],
+
+        "TensorFlow": [
+            "tensorflow"
+        ],
+
+        "PyTorch": [
+            "pytorch"
+        ],
+
+        "Docker": [
+            "docker"
+        ],
+
+        "AWS": [
+            "aws",
+            "amazon web services"
+        ]
+
+    }
+
+
+    for skill, keywords in skill_variations.items():
+
+        for keyword in keywords:
+
+            if keyword in text:
+
+                detected.append(skill)
+                break
+
 
     return detected
-
 
 
 
@@ -116,42 +192,66 @@ def calculate_score(text, skills):
 
 
 
-def calculate_ats_score(text, skills, prediction):
+def calculate_score(text, skills):
 
     score = 0
 
     text_lower = text.lower()
 
 
-    score += min(len(skills) * 5, 50)
+    # Contact information
 
-
-    sections = [
-
-        "education",
-        "project",
-        "experience",
-        "skills",
-        "certification"
-
-    ]
-
-
-    for section in sections:
-
-        if section in text_lower:
-
-            score += 10
-
-
-    if prediction.lower() in text_lower:
+    if re.search(r'[\w\.-]+@[\w\.-]+', text):
 
         score += 10
 
 
+    if re.search(r'\b\d{10}\b', text):
+
+        score += 10
+
+
+
+    # Technical skills
+
+    score += min(len(skills) * 5, 30)
+
+
+
+    # Resume sections
+
+    sections = {
+
+        "education": 10,
+
+        "experience": 10,
+
+        "project": 10,
+
+        "certification": 5,
+
+        "summary": 5
+
+    }
+
+
+    for section, points in sections.items():
+
+        if section in text_lower:
+
+            score += points
+
+
+
+    # Length check
+
+    if len(text) > 500:
+
+        score += 5
+
+
+
     return min(score, 100)
-
-
 
 
 def generate_suggestions(skills, prediction):
@@ -288,16 +388,11 @@ def analyze_resume_quality(text, skills):
     return strengths, weaknesses
 
 
-
-
 def extract_contact_info(text):
 
     name = "Not Found"
-
     email = "Not Found"
-
     phone = "Not Found"
-
 
 
     email_match = re.search(
@@ -306,9 +401,7 @@ def extract_contact_info(text):
     )
 
     if email_match:
-
         email = email_match.group()
-
 
 
     phone_match = re.search(
@@ -317,9 +410,22 @@ def extract_contact_info(text):
     )
 
     if phone_match:
-
         phone = phone_match.group()
 
+
+    ignored = [
+        "contact",
+        "profile",
+        "summary",
+        "objective",
+        "resume",
+        "curriculum vitae",
+        "skills",
+        "education",
+        "experience",
+        "projects",
+        "certification"
+    ]
 
 
     lines = text.split("\n")
@@ -327,14 +433,22 @@ def extract_contact_info(text):
 
     for line in lines:
 
-        line = line.strip()
+        clean = line.strip()
 
-        if len(line.split()) <= 4 and line.replace(" ","").isalpha():
+        if not clean:
+            continue
 
-            name = line
 
+        if clean.lower() in ignored:
+            continue
+
+
+        if (
+            len(clean.split()) <= 4
+            and clean.replace(" ", "").isalpha()
+        ):
+            name = clean
             break
-
 
 
     return name, email, phone
@@ -347,24 +461,17 @@ def extract_contact_info(text):
 def analyze_job_match(resume_text, job_description):
 
     if job_description.strip() == "":
-
         return 0, [], []
 
 
-
     documents = [
-
         resume_text,
-
         job_description
-
     ]
 
 
     vectorizer = TfidfVectorizer(
-
         stop_words="english"
-
     )
 
 
@@ -372,29 +479,43 @@ def analyze_job_match(resume_text, job_description):
 
 
     similarity = cosine_similarity(
-
         vectors[0:1],
-
         vectors[1:2]
-
     )[0][0]
 
 
     match_score = int(similarity * 100)
 
 
+    stop_words = {
+        "the",
+        "and",
+        "with",
+        "to",
+        "of",
+        "for",
+        "in",
+        "a",
+        "an",
+        "on",
+        "is",
+        "are",
+        "this",
+        "that"
+    }
+
 
     resume_words = set(
-
-        resume_text.lower().split()
-
+        word.lower()
+        for word in re.findall(r'\b[a-zA-Z]+\b', resume_text)
+        if word.lower() not in stop_words
     )
 
 
     job_words = set(
-
-        job_description.lower().split()
-
+        word.lower()
+        for word in re.findall(r'\b[a-zA-Z]+\b', job_description)
+        if word.lower() not in stop_words
     )
 
 
@@ -404,18 +525,30 @@ def analyze_job_match(resume_text, job_description):
     missing = job_words.difference(resume_words)
 
 
-
     return (
-
         match_score,
-
         list(matched)[:15],
-
         list(missing)[:15]
-
     )
+    
+def validate_resume(text):
 
+    invalid_keywords = [
+        "offer letter",
+        "internship offer",
+        "congratulations",
+        "selected for internship",
+        "joining letter",
+        "appointment letter"
+    ]
 
+    text = text.lower()
+
+    for keyword in invalid_keywords:
+        if keyword in text:
+            return False
+
+    return True
 
 
 def extract_text(pdf_path):
@@ -483,7 +616,12 @@ def analyze():
 
     resume_text = extract_text(file_path)
 
+    if not validate_resume(resume_text):
 
+        return render_template(
+            "index.html",
+            error="This document does not appear to be a resume. Please upload your CV."
+    )
 
     prediction = model.predict(
 
@@ -650,3 +788,4 @@ if __name__ == "__main__":
         port=5000
 
     )
+    
