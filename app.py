@@ -87,7 +87,23 @@ def extract_skills(text):
     "OpenCV": ["opencv"],
 
     "Data Structures": ["data structures", "dsa"],
-    "Algorithms": ["algorithms", "algorithm"]
+    "Algorithms": ["algorithms", "algorithm"],
+
+    "GitLab": ["gitlab"],
+    "GitHub Actions": ["github actions"],
+    "Google Sheets": ["google sheets"],
+    "Microsoft Excel": ["microsoft excel", "excel"],
+    "PowerPoint": ["powerpoint", "microsoft  powerpoint"],
+    "LLM": ["llm", "large language model", "large language models"],
+    "LangChain": ["langchain"],
+    "OpenAI": ["openai", "chatgpt", "gpt"],
+    "FastAPI": ["fastapi"],
+    "API": ["api", "rest api", "restful api"],
+    "Computer Vision": ["computer vision"],
+    "YOLO": ["yolo"],
+    "Linux": ["linux"],
+    "VS Code": ["vs code", "visual studio code"],
+    
 }
 
 
@@ -110,59 +126,16 @@ def calculate_score(text, skills):
     score = 0
     text_lower = text.lower()
 
-    # Contact Information
+    # Contact details (15 points)
     if re.search(r'[\w\.-]+@[\w\.-]+', text):
-        score += 10
+        score += 8
 
     if re.search(r'\b\d{10}\b', text):
-        score += 10
-
-    # Education
-    if "education" in text_lower:
-        score += 10
-
-    # Experience
-    if "experience" in text_lower or "internship" in text_lower:
-        score += 15
-
-    # Projects
-    if "project" in text_lower:
-        score += 15
-
-    # Certifications
-    if "certification" in text_lower or "certificate" in text_lower:
-        score += 10
-
-    # Skills
-    score += min(len(skills) * 2, 20)
-
-    # Resume Length
-    words = len(text.split())
-
-    if words >= 300:
-        score += 10
-    elif words >= 200:
         score += 7
-    elif words >= 100:
-        score += 5
 
-    return min(score, 100)
 
-def calculate_ats_score(text, skills, prediction):
-
-    score = 0
-    text_lower = text.lower()
-
-    # Contact Information
-    if re.search(r'[\w\.-]+@[\w\.-]+', text):
-        score += 10
-
-    if re.search(r'\b\d{10}\b', text):
-        score += 10
-
-    # Standard Resume Sections
+    # Resume sections (25 points)
     sections = [
-        "summary",
         "education",
         "skills",
         "experience",
@@ -170,24 +143,168 @@ def calculate_ats_score(text, skills, prediction):
         "certification"
     ]
 
+    found_sections = 0
+
     for section in sections:
         if section in text_lower:
-            score += 8
+            found_sections += 1
 
-    # Technical Skills
+    score += min(found_sections * 5, 25)
+
+
+    # Technical skills (20 points)
     score += min(len(skills) * 2, 20)
 
-    # Resume Length
+
+    # Projects quality (15 points)
+    if "project" in text_lower:
+        score += 10
+
+        if any(word in text_lower for word in [
+            "developed",
+            "created",
+            "built",
+            "implemented",
+            "designed"
+        ]):
+            score += 5
+
+
+    # Experience / Internship (15 points)
+    if any(word in text_lower for word in [
+        "internship",
+        "intern",
+        "experience",
+        "trainee"
+    ]):
+        score += 15
+
+
+    # Resume length (10 points)
     words = len(text.split())
 
-    if 250 <= words <= 800:
+    if words >= 400:
+        score += 10
+    elif words >= 250:
+        score += 7
+    elif words >= 150:
+        score += 5
+
+
+    return min(score, 95)
+
+def calculate_ats_score(text, skills, prediction):
+
+    score = 0
+    text_lower = text.lower()
+
+
+    # Contact information (15 points)
+
+    if re.search(r'[\w\.-]+@[\w\.-]+', text):
+        score += 8
+
+    if re.search(r'\b\d{10}\b', text):
+        score += 7
+
+
+
+    # ATS friendly sections (30 points)
+
+    sections = {
+        "education": 5,
+        "skills": 5,
+        "experience": 5,
+        "project": 5,
+        "certification": 5,
+        "summary": 5
+    }
+
+
+    for section, points in sections.items():
+
+        if section in text_lower:
+            score += points
+
+
+
+    # Skills matching (25 points)
+
+    if len(skills) >= 10:
+        score += 25
+
+    elif len(skills) >= 7:
+        score += 20
+
+    elif len(skills) >= 4:
+        score += 15
+
+    else:
+        score += 5
+
+
+
+    # Resume content quality (20 points)
+
+    strong_words = [
+        "developed",
+        "implemented",
+        "created",
+        "built",
+        "designed",
+        "optimized",
+        "automated"
+    ]
+
+
+    achievement_count = 0
+
+    for word in strong_words:
+
+        if word in text_lower:
+            achievement_count += 1
+
+
+    score += min(achievement_count * 3, 15)
+
+
+
+    # Length check (10 points)
+
+    words = len(text.split())
+
+    if 300 <= words <= 800:
         score += 10
 
-    # Predicted Career Keywords
-    if prediction.lower() in text_lower:
-        score += 10
+    elif words >= 150:
+        score += 5
 
-    return min(score, 100)
+
+
+    # Deduct points for missing important resume sections
+
+    missing_penalties = {
+
+    "education": 5,
+    "skills": 5,
+    "experience": 10,
+    "project": 10,
+    "certification": 5,
+    "summary": 5
+
+     }
+
+
+    for section, penalty in missing_penalties.items():
+
+        if section not in text_lower:
+            score -= penalty
+
+
+
+# Minimum and maximum limits
+
+    return max(min(score, 95), 30)
 
 def generate_suggestions(skills, prediction):
 
@@ -292,18 +409,58 @@ def analyze_resume_quality(text, skills):
 
     # Sections
     sections = {
-        "education": "Education section found.",
-        "experience": "Experience section found.",
-        "project": "Projects section found.",
-        "certification": "Certification section found.",
-        "summary": "Professional summary included."
+
+    "Education": [
+        "education",
+        "academic",
+        "qualification"
+    ],
+
+    "Experience": [
+        "experience",
+        "internship",
+        "intern",
+        "trainee",
+        "work experience",
+        "professional experience"
+    ],
+
+    "Projects": [
+        "project",
+        "projects"
+    ],
+
+    "Certification": [
+        "certificate",
+        "certification",
+        "certifications",
+        "certified",
+        "credential"
+    ],
+
+    "Summary": [
+        "summary",
+        "objective",
+        "profile"
+    ]
+
     }
 
-    for section, message in sections.items():
-        if section in text_lower:
-            strengths.append(message)
+
+    for section, keywords in sections.items():
+
+        found = False
+
+        for keyword in keywords:
+
+            if keyword in text_lower:
+                found = True
+                break
+
+        if found:
+            strengths.append(f"{section} section found.")
         else:
-            weaknesses.append(f"Add a {section.title()} section.")
+            weaknesses.append(f"Add a {section} section.")
 
     # Resume Length
     words = len(text.split())
@@ -356,14 +513,24 @@ def analyze_job_match(resume_text, job_description):
 
     if not job_description.strip():
         return 0, [], []
+    
+    resume_skills = set(extract_skills(resume_text))
+    job_skills = set(extract_skills(job_description))
 
+    matched_skill_count = len(resume_skills & job_skills)
+    total_job_skills = max(len(job_skills), 1)
+
+    skill_score = (matched_skill_count / total_job_skills) * 60
+    
     vectorizer = TfidfVectorizer(stop_words="english")
 
     vectors = vectorizer.fit_transform([resume_text, job_description])
 
     similarity = cosine_similarity(vectors[0:1], vectors[1:2])[0][0]
 
-    match_score = round(similarity * 100)
+    text_score = similarity * 40
+    match_score = round(skill_score + text_score)
+    match_score = min(match_score, 95)
 
     resume_words = set(re.findall(r'\b[a-zA-Z][a-zA-Z+#.]*\b', resume_text.lower()))
     job_words = set(re.findall(r'\b[a-zA-Z][a-zA-Z+#.]*\b', job_description.lower()))
