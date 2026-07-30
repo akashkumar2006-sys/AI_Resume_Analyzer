@@ -29,30 +29,14 @@ model = joblib.load("model/resume_model.pkl")
 # Skills database
 
 SKILLS = [
-
-    "Python",
-    "Machine Learning",
-    "Artificial Intelligence",
-    "AI",
-    "SQL",
-    "Excel",
-    "HTML",
-    "CSS",
-    "JavaScript",
-    "Java",
-    "C++",
-    "Data Structures",
-    "Algorithms",
-    "TensorFlow",
-    "Deep Learning",
-    "Flask",
-    "React",
-    "Power BI",
-    "PyTorch",
-    "Django",
-    "AWS",
-    "Docker"
-
+    "Python","C","C++","Java","JavaScript","HTML","CSS","SQL",
+    "Machine Learning","Artificial Intelligence","Deep Learning",
+    "NLP","Generative AI","Prompt Engineering",
+    "TensorFlow","PyTorch","Scikit-learn","Pandas","NumPy",
+    "Flask","Django","React",
+    "Git","GitHub","Docker","AWS",
+    "Excel","Power BI","REST API","OpenCV",
+    "Data Structures","Algorithms"
 ]
 
 
@@ -66,74 +50,45 @@ def extract_skills(text):
 
     skill_variations = {
 
-        "Python": [
-            "python"
-        ],
+    "Python": ["python"],
+    "C": [" c ", " c language"],
+    "C++": ["c++", "cpp"],
+    "Java": ["java"],
+    "JavaScript": ["javascript", "js"],
+    "HTML": ["html"],
+    "CSS": ["css"],
+    "SQL": ["sql", "mysql", "postgresql"],
 
-        "Machine Learning": [
-            "machine learning",
-            "ml"
-        ],
+    "Machine Learning": ["machine learning", "ml"],
+    "Artificial Intelligence": ["artificial intelligence", "ai"],
+    "Deep Learning": ["deep learning", "dl"],
+    "NLP": ["nlp", "natural language processing"],
+    "Generative AI": ["generative ai", "gen ai"],
+    "Prompt Engineering": ["prompt engineering"],
 
-        "Artificial Intelligence": [
-            "artificial intelligence",
-            "ai"
-        ],
+    "TensorFlow": ["tensorflow"],
+    "PyTorch": ["pytorch"],
+    "Scikit-learn": ["scikit", "sklearn"],
+    "Pandas": ["pandas"],
+    "NumPy": ["numpy"],
 
-        "SQL": [
-            "sql",
-            "mysql",
-            "postgresql"
-        ],
+    "Flask": ["flask"],
+    "Django": ["django"],
+    "React": ["react", "reactjs", "react.js"],
 
-        "JavaScript": [
-            "javascript",
-            "js"
-        ],
+    "Git": ["git"],
+    "GitHub": ["github"],
+    "Docker": ["docker"],
+    "AWS": ["aws", "amazon web services"],
 
-        "React": [
-            "react",
-            "react.js",
-            "reactjs"
-        ],
+    "Excel": ["excel"],
+    "Power BI": ["power bi"],
+    "REST API": ["rest api"],
+    "OpenCV": ["opencv"],
 
-        "C++": [
-            "c++",
-            "cpp"
-        ],
-
-        "Deep Learning": [
-            "deep learning",
-            "dl"
-        ],
-
-        "NLP": [
-            "nlp",
-            "natural language processing"
-        ],
-
-        "Flask": [
-            "flask"
-        ],
-
-        "TensorFlow": [
-            "tensorflow"
-        ],
-
-        "PyTorch": [
-            "pytorch"
-        ],
-
-        "Docker": [
-            "docker"
-        ],
-
-        "AWS": [
-            "aws",
-            "amazon web services"
-        ]
-
-    }
+    "Data Structures": ["data structures", "dsa"],
+    "Algorithms": ["algorithms", "algorithm"]
+}
 
 
     for skill, keywords in skill_variations.items():
@@ -153,61 +108,43 @@ def extract_skills(text):
 def calculate_score(text, skills):
 
     score = 0
-
     text_lower = text.lower()
 
-
-    # Contact information
-
+    # Contact Information
     if re.search(r'[\w\.-]+@[\w\.-]+', text):
-
         score += 10
-
 
     if re.search(r'\b\d{10}\b', text):
-
         score += 10
 
+    # Education
+    if "education" in text_lower:
+        score += 10
 
+    # Experience
+    if "experience" in text_lower or "internship" in text_lower:
+        score += 15
 
-    # Technical skills
+    # Projects
+    if "project" in text_lower:
+        score += 15
 
-    score += min(len(skills) * 5, 30)
+    # Certifications
+    if "certification" in text_lower or "certificate" in text_lower:
+        score += 10
 
+    # Skills
+    score += min(len(skills) * 2, 20)
 
+    # Resume Length
+    words = len(text.split())
 
-    # Resume sections
-
-    sections = {
-
-        "education": 10,
-
-        "experience": 10,
-
-        "project": 10,
-
-        "certification": 5,
-
-        "summary": 5
-
-    }
-
-
-    for section, points in sections.items():
-
-        if section in text_lower:
-
-            score += points
-
-
-
-    # Length check
-
-    if len(text) > 500:
-
+    if words >= 300:
+        score += 10
+    elif words >= 200:
+        score += 7
+    elif words >= 100:
         score += 5
-
-
 
     return min(score, 100)
 
@@ -216,20 +153,37 @@ def calculate_ats_score(text, skills, prediction):
     score = 0
     text_lower = text.lower()
 
-    score += min(len(skills) * 5, 50)
+    # Contact Information
+    if re.search(r'[\w\.-]+@[\w\.-]+', text):
+        score += 10
 
+    if re.search(r'\b\d{10}\b', text):
+        score += 10
+
+    # Standard Resume Sections
     sections = [
+        "summary",
         "education",
-        "project",
-        "experience",
         "skills",
+        "experience",
+        "project",
         "certification"
     ]
 
     for section in sections:
         if section in text_lower:
-            score += 10
+            score += 8
 
+    # Technical Skills
+    score += min(len(skills) * 2, 20)
+
+    # Resume Length
+    words = len(text.split())
+
+    if 250 <= words <= 800:
+        score += 10
+
+    # Predicted Career Keywords
     if prediction.lower() in text_lower:
         score += 10
 
@@ -237,134 +191,127 @@ def calculate_ats_score(text, skills, prediction):
 
 def generate_suggestions(skills, prediction):
 
-    recommended = {
+    suggestions = []
 
+    recommendations = {
         "AI Engineer": [
             "Deep Learning",
             "TensorFlow",
             "PyTorch",
-            "SQL"
+            "Docker"
         ],
-
         "ML Engineer": [
-            "Deep Learning",
+            "Scikit-learn",
             "TensorFlow",
+            "SQL",
             "Statistics"
         ],
-
         "Data Analyst": [
             "SQL",
             "Excel",
-            "Power BI"
+            "Power BI",
+            "Python"
         ],
-
         "Frontend Developer": [
+            "HTML",
+            "CSS",
             "JavaScript",
-            "React",
-            "UI Design"
+            "React"
         ],
-
         "Software Engineer": [
             "Data Structures",
             "Algorithms",
-            "System Design"
+            "Git",
+            "Docker"
         ]
-
     }
 
-
-    required = recommended.get(prediction, [])
-
+    required = recommendations.get(prediction, [])
 
     missing = []
 
-
     for skill in required:
-
         if skill.lower() not in [s.lower() for s in skills]:
-
             missing.append(skill)
 
-
-
-    suggestions = [
-
-        "Add more practical projects",
-
-        "Add certifications and experience"
-
-    ]
-
-
-    if len(skills) < 5:
-
-        suggestions.append(
-            "Add more technical skills"
-        )
-
-
     if missing:
-
         suggestions.append(
-            "Learn missing skills for better career opportunities"
+            "Learn these important skills: " + ", ".join(missing)
         )
 
+    if len(skills) < 8:
+        suggestions.append(
+            "Add more technical skills to strengthen your resume."
+        )
+
+    suggestions.append(
+        "Include 2–3 real-world projects with measurable outcomes."
+    )
+
+    suggestions.append(
+        "Add GitHub and LinkedIn profile links."
+    )
+
+    suggestions.append(
+        "Include internships, certifications, and achievements."
+    )
+
+    suggestions.append(
+        "Keep your resume ATS-friendly using clear section headings."
+    )
 
     return missing, suggestions
-
 
 
 
 def analyze_resume_quality(text, skills):
 
     strengths = []
-
     weaknesses = []
 
     text_lower = text.lower()
 
-
-
-    if len(skills) >= 5:
-
-        strengths.append(
-            "Strong technical skill coverage"
-        )
-
+    # Contact
+    if re.search(r'[\w\.-]+@[\w\.-]+', text):
+        strengths.append("Professional email address detected.")
     else:
+        weaknesses.append("Add a professional email address.")
 
-        weaknesses.append(
-            "Add more technical skills"
-        )
-
-
-
-    if "project" in text_lower:
-
-        strengths.append(
-            "Projects section detected"
-        )
-
+    if re.search(r'\b\d{10}\b', text):
+        strengths.append("Phone number detected.")
     else:
+        weaknesses.append("Add your phone number.")
 
-        weaknesses.append(
-            "Add projects section"
-        )
-
-
-
-    if "experience" in text_lower or "internship" in text_lower:
-
-        strengths.append(
-            "Experience detected"
-        )
-
+    # Skills
+    if len(skills) >= 8:
+        strengths.append("Excellent technical skill coverage.")
+    elif len(skills) >= 5:
+        strengths.append("Good technical skill coverage.")
     else:
+        weaknesses.append("Add more relevant technical skills.")
 
-        weaknesses.append(
-            "Add internship or experience"
-        )
+    # Sections
+    sections = {
+        "education": "Education section found.",
+        "experience": "Experience section found.",
+        "project": "Projects section found.",
+        "certification": "Certification section found.",
+        "summary": "Professional summary included."
+    }
 
+    for section, message in sections.items():
+        if section in text_lower:
+            strengths.append(message)
+        else:
+            weaknesses.append(f"Add a {section.title()} section.")
+
+    # Resume Length
+    words = len(text.split())
+
+    if words >= 250:
+        strengths.append("Resume has a good overall length.")
+    else:
+        weaknesses.append("Expand your resume with more achievements and projects.")
 
     return strengths, weaknesses
 
@@ -401,83 +348,46 @@ def extract_contact_info(text):
             name = line.title()
             break
 
-    return name, email, phone
+    return email, phone
 
 # Improved NLP Job Matching
 
 def analyze_job_match(resume_text, job_description):
 
-    if job_description.strip() == "":
+    if not job_description.strip():
         return 0, [], []
 
+    vectorizer = TfidfVectorizer(stop_words="english")
 
-    documents = [
-        resume_text,
-        job_description
-    ]
+    vectors = vectorizer.fit_transform([resume_text, job_description])
 
+    similarity = cosine_similarity(vectors[0:1], vectors[1:2])[0][0]
 
-    vectorizer = TfidfVectorizer(
-        stop_words="english"
-    )
+    match_score = round(similarity * 100)
 
-
-    vectors = vectorizer.fit_transform(documents)
-
-
-    similarity = cosine_similarity(
-        vectors[0:1],
-        vectors[1:2]
-    )[0][0]
-
-
-    match_score = int(similarity * 100)
-
+    resume_words = set(re.findall(r'\b[a-zA-Z][a-zA-Z+#.]*\b', resume_text.lower()))
+    job_words = set(re.findall(r'\b[a-zA-Z][a-zA-Z+#.]*\b', job_description.lower()))
 
     stop_words = {
-        "the",
-        "and",
-        "with",
-        "to",
-        "of",
-        "for",
-        "in",
-        "a",
-        "an",
-        "on",
-        "is",
-        "are",
-        "this",
-        "that"
+        "the","and","for","with","from","into","your","our","their",
+        "will","have","has","had","this","that","these","those",
+        "you","are","who","all","any","can","should","must",
+        "using","ability","skills","skill","knowledge","good",
+        "work","working","candidate","experience","required"
     }
 
+    resume_words -= stop_words
+    job_words -= stop_words
 
-    resume_words = set(
-        word.lower()
-        for word in re.findall(r'\b[a-zA-Z]+\b', resume_text)
-        if word.lower() not in stop_words
-    )
-
-
-    job_words = set(
-        word.lower()
-        for word in re.findall(r'\b[a-zA-Z]+\b', job_description)
-        if word.lower() not in stop_words
-    )
-
-
-    matched = resume_words.intersection(job_words)
-
-
-    missing = job_words.difference(resume_words)
-
+    matched = sorted(list(resume_words & job_words))
+    missing = sorted(list(job_words - resume_words))
 
     return (
-        match_score,
-        list(matched)[:15],
-        list(missing)[:15]
+        min(match_score, 100),
+        matched[:20],
+        missing[:20]
     )
-    
+
 def validate_resume(text):
 
     invalid_keywords = [
@@ -520,7 +430,13 @@ def extract_text(pdf_path):
 
     return text
 
-
+def get_score_color(score):
+    if score >= 80:
+        return "green"
+    elif score >= 60:
+        return "yellow"
+    else:
+        return "red"
 
 
 @app.route("/")
@@ -641,6 +557,10 @@ def analyze():
     )
 
 
+    resume_color = get_score_color(score)
+    ats_color = get_score_color(ats_score)
+    job_color = get_score_color(job_match)
+
 
     return render_template(
 
@@ -674,7 +594,13 @@ def analyze():
 
         phone=phone,
 
-        resume_text=resume_text
+        resume_text=resume_text,
+        
+        resume_color=resume_color,
+        
+        ats_color=ats_color,
+        
+        job_color=job_color,
 
     )
     
