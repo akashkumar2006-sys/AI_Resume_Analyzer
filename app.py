@@ -375,67 +375,33 @@ def extract_contact_info(text):
     email = "Not Found"
     phone = "Not Found"
 
-
-    email_match = re.search(
-        r'[\w\.-]+@[\w\.-]+',
-        text
-    )
-
+    email_match = re.search(r'[\w\.-]+@[\w\.-]+', text)
     if email_match:
         email = email_match.group()
 
-
-    phone_match = re.search(
-        r'\b\d{10}\b',
-        text
-    )
-
+    phone_match = re.search(r'\b\d{10}\b', text)
     if phone_match:
         phone = phone_match.group()
 
-
     ignored = [
-        "contact",
-        "profile",
-        "summary",
-        "objective",
-        "resume",
-        "curriculum vitae",
-        "skills",
-        "education",
-        "experience",
-        "projects",
-        "certification"
+        "contact","profile","summary","objective",
+        "skills","education","experience",
+        "projects","certification","languages",
+        "at college"
     ]
 
+    lines = [line.strip() for line in text.split("\n") if line.strip()]
 
-    lines = text.split("\n")
-
-
-    for line in lines:
-
-        clean = line.strip()
-
-        if not clean:
-            continue
-
-
-        if clean.lower() in ignored:
-            continue
-
-
+    for line in lines[:15]:
         if (
-            len(clean.split()) <= 4
-            and clean.replace(" ", "").isalpha()
+            2 <= len(line.split()) <= 4
+            and line.replace(" ", "").replace(".", "").isalpha()
+            and line.lower() not in ignored
         ):
-            name = clean
+            name = line.title()
             break
 
-
     return name, email, phone
-
-
-
 
 # Improved NLP Job Matching
 
@@ -769,4 +735,3 @@ if __name__ == "__main__":
         port=5000
 
     )
-    
