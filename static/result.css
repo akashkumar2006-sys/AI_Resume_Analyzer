@@ -500,9 +500,7 @@ font-weight:700;
 
 color:#fff;
 
-background:
-
-conic-gradient(#00d4ff 0deg,#4f8cff 240deg,#1d2d45 240deg);
+background: var(--circle-color);
 
 position:relative;
 
@@ -1337,4 +1335,15 @@ width:100%;
 
 }
 
+}
+.green{
+    --circle-color: conic-gradient(#22c55e 0deg,#22c55e 360deg,#1d2d45 360deg);
+}
+
+.yellow{
+    --circle-color: conic-gradient(#facc15 0deg,#facc15 360deg,#1d2d45 360deg);
+}
+
+.red{
+    --circle-color: conic-gradient(#ef4444 0deg,#ef4444 360deg,#1d2d45 360deg);
 }
