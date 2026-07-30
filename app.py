@@ -157,48 +157,6 @@ def calculate_score(text, skills):
     text_lower = text.lower()
 
 
-    score += min(len(skills) * 5, 40)
-
-
-    if len(text) > 1000:
-
-        score += 20
-
-    elif len(text) > 500:
-
-        score += 10
-
-
-    sections = [
-
-        "education",
-        "project",
-        "experience",
-        "certification",
-        "skills"
-
-    ]
-
-
-    for section in sections:
-
-        if section in text_lower:
-
-            score += 8
-
-
-    return min(score, 100)
-
-
-
-
-def calculate_score(text, skills):
-
-    score = 0
-
-    text_lower = text.lower()
-
-
     # Contact information
 
     if re.search(r'[\w\.-]+@[\w\.-]+', text):
@@ -253,6 +211,29 @@ def calculate_score(text, skills):
 
     return min(score, 100)
 
+def calculate_ats_score(text, skills, prediction):
+
+    score = 0
+    text_lower = text.lower()
+
+    score += min(len(skills) * 5, 50)
+
+    sections = [
+        "education",
+        "project",
+        "experience",
+        "skills",
+        "certification"
+    ]
+
+    for section in sections:
+        if section in text_lower:
+            score += 10
+
+    if prediction.lower() in text_lower:
+        score += 10
+
+    return min(score, 100)
 
 def generate_suggestions(skills, prediction):
 
@@ -788,4 +769,4 @@ if __name__ == "__main__":
         port=5000
 
     )
-
+    
