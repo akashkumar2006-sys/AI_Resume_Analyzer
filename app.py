@@ -348,7 +348,7 @@ def extract_contact_info(text):
             name = line.title()
             break
 
-    return email, phone
+    return name, email, phone
 
 # Improved NLP Job Matching
 
